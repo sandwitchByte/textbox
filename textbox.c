@@ -4,16 +4,23 @@
 #include <string.h>
 #define STRING_LIMIT 256
 
-int get_term_width(){
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  return w.ws_col;
-}
+struct config{
 
-int get_term_height(){
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  return w.ws_row;
+  char corner;
+  char horizontal_line;
+  char vertical_line;
+
+  int help;
+};
+  
+void show_help(struct config conf){
+  printf("Usage: textbox [MESSAGE] [OPTION ..]\n\n");
+  printf("textbox is a small tool that puts text into an ASCII box\n\n");
+  printf("Options:\n");
+  printf("\t-c    set a custom character for the corner (default is '+')\n");
+  printf("\t-h    set a custom character for the horizontal lines (default is '-')\n");
+  printf("\t-v    set a custom character for the vertical lines (default is '|')\n");
+  printf("\t-h    show help\n");
 }
 
 void draw_horizontal_bound(char corner, char line, int width){
@@ -32,10 +39,6 @@ void draw_space(char line2, int width){
 
 
 void draw_box(int height, int width, char corner, char line, char line2, char text[STRING_LIMIT]){
-
-  //TO DO
-  // theres a bug with displaying the string
-
   
   draw_horizontal_bound(corner, line, width);
   draw_space(line2, width);
@@ -43,13 +46,7 @@ void draw_box(int height, int width, char corner, char line, char line2, char te
   //insert the string
   printf("%c%c", line2, ' ');
   printf("%s", text);
-  printf("%c%c", line2, '\n');  //bug here
-
-  // k ik where the bug is
-  //when inputting the string im also inputting a newline to finish the command
-  //maybe it becomes part of the string who knows ..
-  
-  // it should be solved if i start taking input from command args (i hope)
+  printf(" %c%c", line2, '\n'); 
 
   draw_space(line2, width);
   draw_horizontal_bound(corner, line, width);
@@ -57,15 +54,13 @@ void draw_box(int height, int width, char corner, char line, char line2, char te
 }
 
 int main(int argc, char **argv){
-  int term_height = get_term_height();
-  int term_width = get_term_width();
 
   char str[STRING_LIMIT];
-  fgets(str, STRING_LIMIT, stdin);
+  strcpy(str, argv[1]);
   int s_width = strlen(str);
 
   printf("\n\n");
-  draw_box(3, s_width, '#', '#', '#', str);
-  
+  draw_box(3, s_width, '+', '-', '|', str);
+
   return 0;
 }
